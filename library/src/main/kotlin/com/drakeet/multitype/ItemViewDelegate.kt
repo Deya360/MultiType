@@ -18,6 +18,7 @@ package com.drakeet.multitype
 
 import android.content.Context
 import android.view.ViewGroup
+import androidx.paging.PagedList
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -48,14 +49,17 @@ abstract class ItemViewDelegate<T, VH : ViewHolder> {
 
   /**
    * Gets or sets the items of the associated [MultiTypeAdapter].
-   * @see MultiTypeAdapter.items
    * @since v4.0.0
    */
-  var adapterItems: List<Any>
-    get() = adapter.items
+  var adapterItems: PagedList<Any>?
+    get() = adapter.currentList
     set(value) {
-      adapter.items = value
+      adapter.submitList(value)
     }
+
+  abstract fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean
+
+  abstract fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean
 
   abstract fun onCreateViewHolder(context: Context, parent: ViewGroup): VH
 

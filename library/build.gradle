@@ -18,8 +18,11 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'org.jetbrains.dokka-android'
 apply plugin: 'jacoco'
-apply from: rootProject.file('gradle/publish-docs.gradle')
-apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+//apply from: rootProject.file('gradle/publish-docs.gradle')
+//apply from: rootProject.file('gradle/gradle-mvn-push.gradle')
+
+group='com.github.Deya360'
+apply plugin: 'com.github.dcendents.android-maven'
 
 android {
   compileSdkVersion buildConfig.compileSdkVersion
@@ -60,6 +63,8 @@ dependencies {
   testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+  implementation "androidx.paging:paging-runtime-ktx:2.1.2"
+
   api "androidx.annotation:annotation:$annotationVersion"
   api "androidx.recyclerview:recyclerview:$recyclerviewVersion"
 }

@@ -19,6 +19,8 @@ package com.drakeet.multitype
 import android.util.Log
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import java.util.concurrent.CopyOnWriteArrayList
@@ -37,10 +39,9 @@ open class MultiTypeAdapter @JvmOverloads constructor(
    *
    * @since v2.4.1
    */
-  open var items: List<Any> = emptyList(),
   open val initialCapacity: Int = 0,
   open var types: Types = MutableTypes(initialCapacity)
-) : RecyclerView.Adapter<ViewHolder>() {
+) : PagedListAdapter<Any, ViewHolder>(mDifferCallback) {
 
   /**
    * Registers a type class and its item view delegate. If you have registered the class,
@@ -132,7 +133,7 @@ open class MultiTypeAdapter @JvmOverloads constructor(
   }
 
   override fun getItemViewType(position: Int): Int {
-    return indexInTypesOf(position, items[position])
+    return indexInTypesOf(position, getItem(position)!!)
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, indexViewType: Int): ViewHolder {
@@ -144,11 +145,9 @@ open class MultiTypeAdapter @JvmOverloads constructor(
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: List<Any>) {
-    val item = items[position]
+    val item = getItem(position)!!
     getOutDelegateByViewHolder(holder).onBindViewHolder(holder, item, payloads)
   }
-
-  override fun getItemCount(): Int = items.size
 
   /**
    * Called to return the stable ID for the item, and passes the event to its associated delegate.
@@ -160,7 +159,7 @@ open class MultiTypeAdapter @JvmOverloads constructor(
    * @since v3.2.0
    */
   override fun getItemId(position: Int): Long {
-    val item = items[position]
+    val item = getItem(position)!!
     val itemViewType = getItemViewType(position)
     return types.getType<Any>(itemViewType).delegate.getItemId(item)
   }
@@ -240,7 +239,30 @@ open class MultiTypeAdapter @JvmOverloads constructor(
     }
   }
 
+  fun getAreItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+    val idx = types.firstIndexOf(oldItem.javaClass)
+    return (types as MutableTypes).types[idx].delegate.areItemsTheSame(oldItem,newItem)
+  }
+
+  fun getAreContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+    val idx = types.firstIndexOf(oldItem.javaClass)
+    return (types as MutableTypes).types[idx].delegate.areContentsTheSame(oldItem,newItem)
+  }
+
+  init {
+    mDifferCallback = object : DiffUtil.ItemCallback<Any>() {
+      override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+        return getAreItemsTheSame(oldItem,newItem)
+      }
+
+      override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+        return getAreContentsTheSame(oldItem,newItem)
+      }
+    }
+  }
+
   companion object {
     private const val TAG = "MultiTypeAdapter"
+    lateinit var mDifferCallback : DiffUtil.ItemCallback<Any>
   }
 }
