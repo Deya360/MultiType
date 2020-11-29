@@ -41,9 +41,8 @@ open class MultiTypeAdapter @JvmOverloads constructor(
          */
         open val initialCapacity: Int = 0,
         open var types: Types = MutableTypes(initialCapacity),
-        mDifferCallback : DiffUtil.ItemCallback<Any>
-) : PagedListAdapter<Any, ViewHolder>(mDifferCallback) {
-
+        mDifferCallback : DiffUtil.ItemCallback<DifferItem>
+) : PagedListAdapter<DifferItem, ViewHolder>(mDifferCallback) {
   /**
    * Registers a type class and its item view delegate. If you have registered the class,
    * it will override the original delegate(s). Note that the method is non-thread-safe
@@ -57,32 +56,32 @@ open class MultiTypeAdapter @JvmOverloads constructor(
    * @param delegate the item view delegate
    * @param T the item data type
    * */
-  fun <T> register(clazz: Class<T>, delegate: ItemViewDelegate<T, *>) {
+  fun <T : DifferItem> register(clazz: Class<T>, delegate: ItemViewDelegate<T , *>) {
     unregisterAllTypesIfNeeded(clazz)
     register(Type(clazz, delegate, DefaultLinker()))
   }
 
-  inline fun <reified T : Any> register(delegate: ItemViewDelegate<T, *>) {
+  inline fun <reified T : DifferItem> register(delegate: ItemViewDelegate<T, *>) {
     register(T::class.java, delegate)
   }
 
-  fun <T : Any> register(clazz: KClass<T>, delegate: ItemViewDelegate<T, *>) {
+  fun <T : DifferItem> register(clazz: KClass<T>, delegate: ItemViewDelegate<T, *>) {
     register(clazz.java, delegate)
   }
 
-  fun <T> register(clazz: Class<T>, binder: ItemViewBinder<T, *>) {
+  fun <T : DifferItem> register(clazz: Class<T>, binder: ItemViewBinder<T, *>) {
     register(clazz, binder as ItemViewDelegate<T, *>)
   }
 
-  inline fun <reified T : Any> register(binder: ItemViewBinder<T, *>) {
+  inline fun <reified T : DifferItem> register(binder: ItemViewBinder<T, *>) {
     register(binder as ItemViewDelegate<T, *>)
   }
 
-  fun <T : Any> register(clazz: KClass<T>, binder: ItemViewBinder<T, *>) {
+  fun <T : DifferItem> register(clazz: KClass<T>, binder: ItemViewBinder<T, *>) {
     register(clazz, binder as ItemViewDelegate<T, *>)
   }
 
-  internal fun <T> register(type: Type<T>) {
+  internal fun <T: DifferItem> register(type: Type<T>) {
     types.register(type)
     type.delegate._adapter = this
   }
@@ -101,13 +100,13 @@ open class MultiTypeAdapter @JvmOverloads constructor(
    * @see [register]
    */
   @CheckResult
-  fun <T> register(clazz: Class<T>): OneToManyFlow<T> {
+  fun <T : DifferItem> register(clazz: Class<T>): OneToManyFlow<T> {
     unregisterAllTypesIfNeeded(clazz)
     return OneToManyBuilder(this, clazz)
   }
 
   @CheckResult
-  fun <T : Any> register(clazz: KClass<T>): OneToManyFlow<T> {
+  fun <T : DifferItem> register(clazz: KClass<T>): OneToManyFlow<T> {
     return register(clazz.java)
   }
 
@@ -127,7 +126,7 @@ open class MultiTypeAdapter @JvmOverloads constructor(
   fun registerAll(types: Types) {
     val size = types.size
     for (i in 0 until size) {
-      val type = types.getType<Any>(i)
+      val type = types.getType<DifferItem>(i)
       unregisterAllTypesIfNeeded(type.clazz)
       register(type)
     }
@@ -138,7 +137,7 @@ open class MultiTypeAdapter @JvmOverloads constructor(
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, indexViewType: Int): ViewHolder {
-    return types.getType<Any>(indexViewType).delegate.onCreateViewHolder(parent.context, parent)
+    return types.getType<DifferItem>(indexViewType).delegate.onCreateViewHolder(parent.context, parent)
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -162,7 +161,7 @@ open class MultiTypeAdapter @JvmOverloads constructor(
   override fun getItemId(position: Int): Long {
     val item = getItem(position)!!
     val itemViewType = getItemViewType(position)
-    return types.getType<Any>(itemViewType).delegate.getItemId(item)
+    return types.getType<DifferItem>(itemViewType).delegate.getItemId(item)
   }
 
   /**
@@ -219,16 +218,16 @@ open class MultiTypeAdapter @JvmOverloads constructor(
     getOutDelegateByViewHolder(holder).onViewDetachedFromWindow(holder)
   }
 
-  private fun getOutDelegateByViewHolder(holder: ViewHolder): ItemViewDelegate<Any, ViewHolder> {
+  private fun getOutDelegateByViewHolder(holder: ViewHolder): ItemViewDelegate<DifferItem, ViewHolder> {
     @Suppress("UNCHECKED_CAST")
-    return types.getType<Any>(holder.itemViewType).delegate as ItemViewDelegate<Any, ViewHolder>
+    return types.getType<DifferItem>(holder.itemViewType).delegate as ItemViewDelegate<DifferItem, ViewHolder>
   }
 
   @Throws(DelegateNotFoundException::class)
-  internal fun indexInTypesOf(position: Int, item: Any): Int {
+  internal fun indexInTypesOf(position: Int, item: DifferItem): Int {
     val index = types.firstIndexOf(item.javaClass)
     if (index != -1) {
-      val linker = types.getType<Any>(index).linker
+      val linker = types.getType<DifferItem>(index).linker
       return index + linker.index(position, item)
     }
     throw DelegateNotFoundException(item.javaClass)
@@ -240,19 +239,16 @@ open class MultiTypeAdapter @JvmOverloads constructor(
     }
   }
 
-  fun getAreItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-    val idx = types.firstIndexOf(oldItem::class.java)
-    return (types as MutableTypes).types[idx].delegate.areItemsTheSameA(oldItem, newItem)
+  fun getAreItemsTheSame(oldItem: DifferItem, newItem: DifferItem): Boolean {
+    return oldItem.isOtherItemTheSame(newItem)
   }
 
-  fun getAreContentsTheSame(oldItem: Any, newItem: Any): Boolean {
-    val idx = types.firstIndexOf(oldItem.javaClass)
-    return (types as MutableTypes).types[idx].delegate.areContentsTheSameA(oldItem, newItem)
+  fun getAreContentsTheSame(oldItem: DifferItem, newItem: DifferItem): Boolean {
+    return oldItem.isOtherContentsTheSame(newItem)
   }
 
-  fun getGetChangePayload(oldItem: Any, newItem: Any): Any {
-    val idx = types.firstIndexOf(oldItem.javaClass)
-    return (types as MutableTypes).types[idx].delegate.getChangePayloadA(oldItem, newItem)
+  fun getGetChangePayload(oldItem: DifferItem, newItem: DifferItem): Any? {
+    return oldItem.getChangePayload(newItem)
   }
 
   companion object {

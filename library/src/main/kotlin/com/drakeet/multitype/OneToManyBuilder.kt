@@ -21,7 +21,7 @@ import androidx.annotation.CheckResult
 /**
  * @author Drakeet Xu
  */
-internal class OneToManyBuilder<T>(
+internal class OneToManyBuilder<T : DifferItem>(
   private val adapter: MultiTypeAdapter,
   private val clazz: Class<T>
 ) : OneToManyFlow<T>, OneToManyEndpoint<T> {

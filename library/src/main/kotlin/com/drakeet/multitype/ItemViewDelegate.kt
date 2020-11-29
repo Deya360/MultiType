@@ -51,32 +51,11 @@ abstract class ItemViewDelegate<T, VH : ViewHolder> {
    * Gets or sets the items of the associated [MultiTypeAdapter].
    * @since v4.0.0
    */
-  var adapterItems: PagedList<Any>?
+  var adapterAdapterItems: PagedList<DifferItem>?
     get() = adapter.currentList
     set(value) {
       adapter.submitList(value)
     }
-
-  @Suppress("UNCHECKED_CAST")
-  internal fun areItemsTheSameA(oldItem: Any, newItem: Any): Boolean {
-    return areItemsTheSame(oldItem as T, newItem as T)
-  }
-
-  @Suppress("UNCHECKED_CAST")
-  internal fun areContentsTheSameA(oldItem: Any, newItem: Any): Boolean {
-    return areContentsTheSame(oldItem as T, newItem as T)
-  }
-
-  @Suppress("UNCHECKED_CAST")
-  internal fun getChangePayloadA(oldItem: Any, newItem: Any): Any {
-    return getChangePayload(oldItem as T, newItem as T)
-  }
-
-  abstract fun areItemsTheSame(oldItem: T, newItem: T): Boolean
-
-  abstract fun areContentsTheSame(oldItem: T, newItem: T): Boolean
-
-  abstract fun getChangePayload(oldItem: T, newItem: T): Any
 
   abstract fun onCreateViewHolder(context: Context, parent: ViewGroup): VH
 
