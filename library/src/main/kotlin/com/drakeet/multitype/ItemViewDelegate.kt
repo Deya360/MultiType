@@ -22,9 +22,6 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import java.lang.RuntimeException
-import java.lang.reflect.TypeVariable
-import kotlin.reflect.KClass
 
 /***
  * @author Drakeet Xu

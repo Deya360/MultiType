@@ -40,7 +40,8 @@ open class MultiTypeAdapter @JvmOverloads constructor(
          * @since v2.4.1
          */
         open val initialCapacity: Int = 0,
-        open var types: Types = MutableTypes(initialCapacity)
+        open var types: Types = MutableTypes(initialCapacity),
+        mDifferCallback : DiffUtil.ItemCallback<Any>
 ) : PagedListAdapter<Any, ViewHolder>(mDifferCallback) {
 
   /**
@@ -254,24 +255,7 @@ open class MultiTypeAdapter @JvmOverloads constructor(
     return (types as MutableTypes).types[idx].delegate.getChangePayloadA(oldItem, newItem)
   }
 
-  init {
-    mDifferCallback = object : DiffUtil.ItemCallback<Any>() {
-      override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-        return getAreItemsTheSame(oldItem, newItem)
-      }
-
-      override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
-        return getAreContentsTheSame(oldItem, newItem)
-      }
-
-      override fun getChangePayload(oldItem: Any, newItem: Any): Any {
-        return getGetChangePayload(oldItem, newItem)
-      }
-    }
-  }
-
   companion object {
     private const val TAG = "MultiTypeAdapter"
-    lateinit var mDifferCallback : DiffUtil.ItemCallback<Any>
   }
 }
