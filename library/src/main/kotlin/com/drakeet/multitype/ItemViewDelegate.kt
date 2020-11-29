@@ -71,7 +71,7 @@ abstract class ItemViewDelegate<T, VH : ViewHolder> {
   }
 
   @Suppress("UNCHECKED_CAST")
-  internal fun getChangePayloadA(oldItem: Any, newItem: Any): Boolean {
+  internal fun getChangePayloadA(oldItem: Any, newItem: Any): Any {
     return getChangePayload(oldItem as T, newItem as T)
   }
 
@@ -79,7 +79,7 @@ abstract class ItemViewDelegate<T, VH : ViewHolder> {
 
   abstract fun areContentsTheSame(oldItem: T, newItem: T): Boolean
 
-  abstract fun getChangePayload(oldItem: T, newItem: T): Boolean
+  abstract fun getChangePayload(oldItem: T, newItem: T): Any
 
   abstract fun onCreateViewHolder(context: Context, parent: ViewGroup): VH
 

@@ -249,7 +249,7 @@ open class MultiTypeAdapter @JvmOverloads constructor(
     return (types as MutableTypes).types[idx].delegate.areContentsTheSameA(oldItem, newItem)
   }
 
-  fun getGetChangePayload(oldItem: Any, newItem: Any): Boolean {
+  fun getGetChangePayload(oldItem: Any, newItem: Any): Any {
     val idx = types.firstIndexOf(oldItem.javaClass)
     return (types as MutableTypes).types[idx].delegate.getChangePayloadA(oldItem, newItem)
   }
