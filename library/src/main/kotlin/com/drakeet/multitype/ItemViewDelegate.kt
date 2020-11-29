@@ -22,6 +22,9 @@ import androidx.paging.PagedList
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutManager
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import java.lang.RuntimeException
+import java.lang.reflect.TypeVariable
+import kotlin.reflect.KClass
 
 /***
  * @author Drakeet Xu
@@ -57,9 +60,26 @@ abstract class ItemViewDelegate<T, VH : ViewHolder> {
       adapter.submitList(value)
     }
 
-  abstract fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean
+  @Suppress("UNCHECKED_CAST")
+  internal fun areItemsTheSameA(oldItem: Any, newItem: Any): Boolean {
+    return areItemsTheSame(oldItem as T, newItem as T)
+  }
 
-  abstract fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean
+  @Suppress("UNCHECKED_CAST")
+  internal fun areContentsTheSameA(oldItem: Any, newItem: Any): Boolean {
+    return areContentsTheSame(oldItem as T, newItem as T)
+  }
+
+  @Suppress("UNCHECKED_CAST")
+  internal fun getChangePayloadA(oldItem: Any, newItem: Any): Boolean {
+    return getChangePayload(oldItem as T, newItem as T)
+  }
+
+  abstract fun areItemsTheSame(oldItem: T, newItem: T): Boolean
+
+  abstract fun areContentsTheSame(oldItem: T, newItem: T): Boolean
+
+  abstract fun getChangePayload(oldItem: T, newItem: T): Boolean
 
   abstract fun onCreateViewHolder(context: Context, parent: ViewGroup): VH
 

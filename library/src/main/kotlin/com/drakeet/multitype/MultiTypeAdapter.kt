@@ -30,17 +30,17 @@ import kotlin.reflect.KClass
  * @author Drakeet Xu
  */
 open class MultiTypeAdapter @JvmOverloads constructor(
-  /**
-   * Sets and updates the items atomically and safely. It is recommended to use this method
-   * to update the items with a new wrapper list or consider using [CopyOnWriteArrayList].
-   *
-   * Note: If you want to refresh the list views after setting items, you should
-   * call [RecyclerView.Adapter.notifyDataSetChanged] by yourself.
-   *
-   * @since v2.4.1
-   */
-  open val initialCapacity: Int = 0,
-  open var types: Types = MutableTypes(initialCapacity)
+        /**
+         * Sets and updates the items atomically and safely. It is recommended to use this method
+         * to update the items with a new wrapper list or consider using [CopyOnWriteArrayList].
+         *
+         * Note: If you want to refresh the list views after setting items, you should
+         * call [RecyclerView.Adapter.notifyDataSetChanged] by yourself.
+         *
+         * @since v2.4.1
+         */
+        open val initialCapacity: Int = 0,
+        open var types: Types = MutableTypes(initialCapacity)
 ) : PagedListAdapter<Any, ViewHolder>(mDifferCallback) {
 
   /**
@@ -240,23 +240,32 @@ open class MultiTypeAdapter @JvmOverloads constructor(
   }
 
   fun getAreItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-    val idx = types.firstIndexOf(oldItem.javaClass)
-    return (types as MutableTypes).types[idx].delegate.areItemsTheSame(oldItem,newItem)
+    val idx = types.firstIndexOf(oldItem::class.java)
+    return (types as MutableTypes).types[idx].delegate.areItemsTheSameA(oldItem, newItem)
   }
 
   fun getAreContentsTheSame(oldItem: Any, newItem: Any): Boolean {
     val idx = types.firstIndexOf(oldItem.javaClass)
-    return (types as MutableTypes).types[idx].delegate.areContentsTheSame(oldItem,newItem)
+    return (types as MutableTypes).types[idx].delegate.areContentsTheSameA(oldItem, newItem)
+  }
+
+  fun getGetChangePayload(oldItem: Any, newItem: Any): Boolean {
+    val idx = types.firstIndexOf(oldItem.javaClass)
+    return (types as MutableTypes).types[idx].delegate.getChangePayloadA(oldItem, newItem)
   }
 
   init {
     mDifferCallback = object : DiffUtil.ItemCallback<Any>() {
       override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-        return getAreItemsTheSame(oldItem,newItem)
+        return getAreItemsTheSame(oldItem, newItem)
       }
 
       override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
-        return getAreContentsTheSame(oldItem,newItem)
+        return getAreContentsTheSame(oldItem, newItem)
+      }
+
+      override fun getChangePayload(oldItem: Any, newItem: Any): Any {
+        return getGetChangePayload(oldItem, newItem)
       }
     }
   }
