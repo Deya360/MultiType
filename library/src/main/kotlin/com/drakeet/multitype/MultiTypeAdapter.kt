@@ -43,6 +43,10 @@ open class MultiTypeAdapter @JvmOverloads constructor(
         open var types: Types = MutableTypes(initialCapacity),
         mDifferCallback : DiffUtil.ItemCallback<DifferItem> = differCallback
 ) : PagedListAdapter<DifferItem, ViewHolder>(mDifferCallback) {
+
+  init {
+      register(LoadingVb())
+  }
   /**
    * Registers a type class and its item view delegate. If you have registered the class,
    * it will override the original delegate(s). Note that the method is non-thread-safe
@@ -133,7 +137,7 @@ open class MultiTypeAdapter @JvmOverloads constructor(
   }
 
   override fun getItemViewType(position: Int): Int {
-    return getItem(position)?.let {  indexInTypesOf(position, it) } ?: -1
+    return getItem(position)?.let {  indexInTypesOf(position, it) } ?: 0
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, indexViewType: Int): ViewHolder {
