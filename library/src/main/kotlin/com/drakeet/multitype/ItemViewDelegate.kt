@@ -51,7 +51,7 @@ abstract class ItemViewDelegate<T, VH : ViewHolder> {
    * Gets or sets the items of the associated [MultiTypeAdapter].
    * @since v4.0.0
    */
-  var adapterAdapterItems: PagedList<DifferItem>?
+  var adapterItems: PagedList<DifferItem>?
     get() = adapter.currentList
     set(value) {
       adapter.submitList(value)
@@ -73,7 +73,7 @@ abstract class ItemViewDelegate<T, VH : ViewHolder> {
    * given item in the items data set.
    * @param item The item within the MultiTypeAdapter's items data set.
    */
-  abstract fun onBindViewHolder(holder: VH, item: T)
+  abstract fun onBindViewHolder(holder: VH, item: T?)
 
   /**
    * Called by MultiTypeAdapter to display the data with its view holder. This method should
@@ -101,7 +101,7 @@ abstract class ItemViewDelegate<T, VH : ViewHolder> {
    * update.
    * @since v2.5.0
    */
-  open fun onBindViewHolder(holder: VH, item: T, payloads: List<Any>) {
+  open fun onBindViewHolder(holder: VH, item: T?, payloads: List<Any>) {
     onBindViewHolder(holder, item)
   }
 

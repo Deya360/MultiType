@@ -41,7 +41,7 @@ open class MultiTypeAdapter @JvmOverloads constructor(
          */
         open val initialCapacity: Int = 0,
         open var types: Types = MutableTypes(initialCapacity),
-        mDifferCallback : DiffUtil.ItemCallback<DifferItem>
+        mDifferCallback : DiffUtil.ItemCallback<DifferItem> = differCallback
 ) : PagedListAdapter<DifferItem, ViewHolder>(mDifferCallback) {
   /**
    * Registers a type class and its item view delegate. If you have registered the class,
@@ -133,7 +133,7 @@ open class MultiTypeAdapter @JvmOverloads constructor(
   }
 
   override fun getItemViewType(position: Int): Int {
-    return indexInTypesOf(position, getItem(position)!!)
+    return getItem(position)?.let {  indexInTypesOf(position, it) } ?: -1
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, indexViewType: Int): ViewHolder {
@@ -145,8 +145,7 @@ open class MultiTypeAdapter @JvmOverloads constructor(
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: List<Any>) {
-    val item = getItem(position)!!
-    getOutDelegateByViewHolder(holder).onBindViewHolder(holder, item, payloads)
+    getOutDelegateByViewHolder(holder).onBindViewHolder(holder, getItem(position), payloads)
   }
 
   /**
@@ -159,9 +158,10 @@ open class MultiTypeAdapter @JvmOverloads constructor(
    * @since v3.2.0
    */
   override fun getItemId(position: Int): Long {
-    val item = getItem(position)!!
-    val itemViewType = getItemViewType(position)
-    return types.getType<DifferItem>(itemViewType).delegate.getItemId(item)
+    return getItem(position)?.let {
+      val itemViewType = getItemViewType(position)
+      types.getType<DifferItem>(itemViewType).delegate.getItemId(it)
+    } ?: RecyclerView.NO_ID
   }
 
   /**
@@ -239,19 +239,21 @@ open class MultiTypeAdapter @JvmOverloads constructor(
     }
   }
 
-  fun getAreItemsTheSame(oldItem: DifferItem, newItem: DifferItem): Boolean {
-    return oldItem.isOtherItemTheSame(newItem)
-  }
-
-  fun getAreContentsTheSame(oldItem: DifferItem, newItem: DifferItem): Boolean {
-    return oldItem.isOtherContentsTheSame(newItem)
-  }
-
-  fun getGetChangePayload(oldItem: DifferItem, newItem: DifferItem): Any? {
-    return oldItem.getChangePayload(newItem)
-  }
-
   companion object {
     private const val TAG = "MultiTypeAdapter"
+    private val differCallback: DiffUtil.ItemCallback<DifferItem> =
+      object : DiffUtil.ItemCallback<DifferItem>() {
+        override fun areItemsTheSame(oldItem: DifferItem, newItem: DifferItem): Boolean {
+          return oldItem.isOtherItemTheSame(newItem)
+        }
+
+        override fun areContentsTheSame(oldItem: DifferItem, newItem: DifferItem): Boolean {
+          return oldItem.isOtherContentsTheSame(newItem)
+        }
+
+        override fun getChangePayload(oldItem: DifferItem, newItem: DifferItem): Any? {
+          return oldItem.getChangePayload(newItem)
+        }
+      }
   }
 }
