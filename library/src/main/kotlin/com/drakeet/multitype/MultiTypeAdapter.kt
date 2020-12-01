@@ -19,7 +19,7 @@ package com.drakeet.multitype
 import android.util.Log
 import android.view.ViewGroup
 import androidx.annotation.CheckResult
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -42,7 +42,7 @@ open class MultiTypeAdapter @JvmOverloads constructor(
         open val initialCapacity: Int = 0,
         open var types: Types = MutableTypes(initialCapacity),
         mDifferCallback : DiffUtil.ItemCallback<DifferItem> = differCallback
-) : PagedListAdapter<DifferItem, ViewHolder>(mDifferCallback) {
+) : PagingDataAdapter<DifferItem, ViewHolder>(mDifferCallback) {
 
   init {
       register(LoadingVb())
@@ -153,20 +153,28 @@ open class MultiTypeAdapter @JvmOverloads constructor(
   }
 
   /**
-   * Called to return the stable ID for the item, and passes the event to its associated delegate.
+   * Note: [getItemId] is final, because stable IDs are unnecessary and therefore unsupported.
    *
-   * @param position Adapter position to query
-   * @return the stable ID of the item at position
-   * @see ItemViewDelegate.getItemId
-   * @see RecyclerView.Adapter.setHasStableIds
-   * @since v3.2.0
+   * [PagingDataAdapter]'s async diffing means that efficient change animations are handled for
+   * you, without the performance drawbacks of [RecyclerView.Adapter.notifyDataSetChanged].
+   * Instead, the diffCallback parameter of the [PagingDataAdapter] serves the same
+   * functionality - informing the adapter and [RecyclerView] how items are changed and moved.
    */
-  override fun getItemId(position: Int): Long {
-    return getItem(position)?.let {
-      val itemViewType = getItemViewType(position)
-      types.getType<DifferItem>(itemViewType).delegate.getItemId(it)
-    } ?: RecyclerView.NO_ID
-  }
+//  /**
+//   * Called to return the stable ID for the item, and passes the event to its associated delegate.
+//   *
+//   * @param position Adapter position to query
+//   * @return the stable ID of the item at position
+//   * @see ItemViewDelegate.getItemId
+//   * @see RecyclerView.Adapter.setHasStableIds
+//   * @since v3.2.0
+//   */
+//  override fun getItemId(position: Int): Long {
+//    return getItem(position)?.let {
+//      val itemViewType = getItemViewType(position)
+//      types.getType<DifferItem>(itemViewType).delegate.getItemId(it)
+//    } ?: RecyclerView.NO_ID
+//  }
 
   /**
    * Called when a view created by this adapter has been recycled, and passes the event to its

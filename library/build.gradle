@@ -63,7 +63,7 @@ dependencies {
   testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-  implementation "androidx.paging:paging-runtime-ktx:2.1.2"
+  implementation "androidx.paging:paging-runtime-ktx:3.0.0-alpha09"
 
   api "androidx.annotation:annotation:$annotationVersion"
   api "androidx.recyclerview:recyclerview:$recyclerviewVersion"

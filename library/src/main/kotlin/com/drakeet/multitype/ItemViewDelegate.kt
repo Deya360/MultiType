@@ -48,14 +48,11 @@ abstract class ItemViewDelegate<T, VH : ViewHolder> {
     }
 
   /**
-   * Gets or sets the items of the associated [MultiTypeAdapter].
+   * Gets the items of the associated [MultiTypeAdapter].
    * @since v4.0.0
    */
-  var adapterItems: PagedList<DifferItem>?
-    get() = adapter.currentList
-    set(value) {
-      adapter.submitList(value)
-    }
+  val adapterItems: List<DifferItem>
+    get() = adapter.snapshot().items
 
   abstract fun onCreateViewHolder(context: Context, parent: ViewGroup): VH
 
@@ -119,7 +116,7 @@ abstract class ItemViewDelegate<T, VH : ViewHolder> {
    * @since v2.3.5. If below v2.3.5, use [ViewHolder.getAdapterPosition] instead.
    */
   fun getPosition(holder: ViewHolder): Int {
-    return holder.adapterPosition
+    return holder.bindingAdapterPosition
   }
 
   /**

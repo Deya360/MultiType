@@ -44,7 +44,7 @@ abstract class ViewDelegate<T, V : View> : ItemViewDelegate<T, ViewDelegate.Hold
    * Warning: this property can only get the correct value in an item root view.
    * @see RecyclerView.LayoutParams.getViewAdapterPosition
    */
-  protected val View.adapterPosition get() = recyclerLayoutParams.viewAdapterPosition
+  protected val View.adapterPosition get() = recyclerLayoutParams.bindingAdapterPosition
 
   /**
    * RecyclerView will automatically convert any original type of LayoutParam into [RecyclerView.LayoutParams],
