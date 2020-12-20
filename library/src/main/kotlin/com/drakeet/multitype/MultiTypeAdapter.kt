@@ -136,6 +136,10 @@ open class MultiTypeAdapter @JvmOverloads constructor(
     }
   }
 
+  fun getItemAtPos(pos : Int): DifferItem? {
+    return getItem(pos)
+  }
+
   override fun getItemViewType(position: Int): Int {
     return getItem(position)?.let {  indexInTypesOf(position, it) } ?: 0
   }
