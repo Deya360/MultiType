@@ -60,29 +60,29 @@ open class MultiTypeAdapter @JvmOverloads constructor(
    * @param delegate the item view delegate
    * @param T the item data type
    * */
-  fun <T : DifferItem> register(clazz: Class<T>, delegate: ItemViewDelegate<T , *>) {
+  fun <T : DifferItem> register(clazz: Class<T>, delegate: ItemViewDelegate<T? , *>) {
     unregisterAllTypesIfNeeded(clazz)
     register(Type(clazz, delegate, DefaultLinker()))
   }
 
-  inline fun <reified T : DifferItem> register(delegate: ItemViewDelegate<T, *>) {
+  inline fun <reified T : DifferItem> register(delegate: ItemViewDelegate<T?, *>) {
     register(T::class.java, delegate)
   }
 
-  fun <T : DifferItem> register(clazz: KClass<T>, delegate: ItemViewDelegate<T, *>) {
+  fun <T : DifferItem> register(clazz: KClass<T>, delegate: ItemViewDelegate<T?, *>) {
     register(clazz.java, delegate)
   }
 
-  fun <T : DifferItem> register(clazz: Class<T>, binder: ItemViewBinder<T, *>) {
-    register(clazz, binder as ItemViewDelegate<T, *>)
+  fun <T : DifferItem> register(clazz: Class<T>, binder: ItemViewBinder<T?, *>) {
+    register(clazz, binder as ItemViewDelegate<T?, *>)
   }
 
-  inline fun <reified T : DifferItem> register(binder: ItemViewBinder<T, *>) {
-    register(binder as ItemViewDelegate<T, *>)
+  inline fun <reified T : DifferItem> register(binder: ItemViewBinder<T?, *>) {
+    register(binder as ItemViewDelegate<T?, *>)
   }
 
-  fun <T : DifferItem> register(clazz: KClass<T>, binder: ItemViewBinder<T, *>) {
-    register(clazz, binder as ItemViewDelegate<T, *>)
+  fun <T : DifferItem> register(clazz: KClass<T>, binder: ItemViewBinder<T?, *>) {
+    register(clazz, binder as ItemViewDelegate<T?, *>)
   }
 
   internal fun <T: DifferItem> register(type: Type<T>) {
